@@ -16,6 +16,6 @@ router.post("/signup", userController.signupUser);
 router.post("/crawl-url", authenticateJwtToken, crawlerController.crawlUrl);
 
 // Logout user
-router.put("/logout", authenticateJwtToken, userController.logoutUser);
+router.delete("/logout", authenticateJwtToken, userController.logoutUser);
 
 module.exports = router;
