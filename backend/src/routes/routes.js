@@ -13,7 +13,11 @@ router.post("/login", userController.loginUser);
 router.post("/signup", userController.signupUser);
 
 // Crawl Url
-router.post("/crawl-url", authenticateJwtToken, crawlerController.crawlUrl);
+router.post(
+  "/crawl-url",
+  authenticateJwtToken,
+  crawlerController.crawlUrlAndVectorize
+);
 
 // Logout user
 router.delete("/logout", authenticateJwtToken, userController.logoutUser);
