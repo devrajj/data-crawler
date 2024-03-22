@@ -1,6 +1,21 @@
 const puppeteer = require("puppeteer");
 const robotsParser = require("robots-parser");
 const fetch = require("node-fetch");
+const natural = require("natural");
+const stopwords = require("stopwords").english;
+
+function preprocessText(text) {
+  text = text.toLowerCase();
+  text = text.replace(/[^\w\s]/gi, "");
+  const tokenizer = new natural.WordTokenizer();
+  const tokens = tokenizer.tokenize(text);
+  const filteredTokens = tokens.filter((token) => !stopwords.includes(token));
+  //Lemmatization reduces words to their base or root form, which helps in standardizing words with the same meaning but different forms.
+  const stemmer = natural.PorterStemmer;
+  const lemmatizedTokens = filteredTokens.map((token) => stemmer.stem(token));
+  const processedText = lemmatizedTokens.join(" ");
+  return processedText;
+}
 
 async function crawlUrl({ url }) {
   const data = {};
@@ -29,7 +44,8 @@ async function crawlUrl({ url }) {
       // }
 
       const textData = await page.$eval("*", (el) => el.innerText);
-      data[queueUrl] = textData;
+      const preprocessedText = preprocessText(textData);
+      data[queueUrl] = preprocessedText;
 
       const hrefs = await page.$$eval("a", (anchorEls) =>
         anchorEls.map((a) => a.href)
@@ -57,6 +73,7 @@ module.exports = {
   crawlUrlAndVectorize: async ({ url }) => {
     try {
       const crawledData = await crawlUrl({ url });
+      console.log("Done with Crawling and preprocessing the url");
       return { ok: true, data: crawledData };
     } catch (err) {
       console.error(
