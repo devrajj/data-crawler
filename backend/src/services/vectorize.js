@@ -17,7 +17,7 @@ async function vectorizeText(text) {
     return { ok: true, data: embeddingsArray };
   } catch (err) {
     console.error("Error in vectorizeText service:", err.stack);
-    return { ok: false, err: err.stack };
+    return { ok: false, err: err.message };
   }
 }
 exports.vectorizeText = vectorizeText;

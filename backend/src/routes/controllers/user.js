@@ -17,7 +17,7 @@ module.exports = {
       return res.failure({ msg: response.err });
     } catch (err) {
       console.error("error in loginUser:", err.stack);
-      return res.failure({ msg: err.stack });
+      return res.failure({ msg: err.message });
     }
   },
 
@@ -44,7 +44,7 @@ module.exports = {
       return res.failure({ msg: response.err });
     } catch (err) {
       console.error("error in signupUser:", err.stack);
-      return res.failure({ msg: err.stack });
+      return res.failure({ msg: err.message });
     }
   },
 
@@ -58,7 +58,7 @@ module.exports = {
       return res.failure({ msg: response.err });
     } catch (err) {
       console.error("error in logoutUser:", err.stack);
-      return res.failure({ msg: err.stack });
+      return res.failure({ msg: err.message });
     }
   },
 };

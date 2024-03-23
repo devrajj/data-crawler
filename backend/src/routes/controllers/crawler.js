@@ -14,7 +14,7 @@ module.exports = {
       return res.failure({ msg: response.err });
     } catch (err) {
       console.error("error in crawlUrlAndVectorize:", err.stack);
-      return res.failure({ msg: err.stack });
+      return res.failure({ msg: err.message });
     }
   },
 };

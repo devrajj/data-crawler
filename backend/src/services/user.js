@@ -39,7 +39,7 @@ module.exports = {
       return { ok: true, data: token };
     } catch (err) {
       console.error("Error in loginUser service:", err.stack);
-      return { ok: false, err: err.stack };
+      return { ok: false, err: err.message };
     }
   },
 
@@ -69,7 +69,7 @@ module.exports = {
       return { ok: true, data: token };
     } catch (err) {
       console.error("Error in signupUser service:", err.stack);
-      return { ok: false, err: err.stack };
+      return { ok: false, err: err.message };
     }
   },
   logoutUser: async ({ token }) => {
@@ -82,7 +82,7 @@ module.exports = {
       return { ok: true, data: "Successfully Logged Out" };
     } catch (err) {
       console.error("Error in logoutUser service:", err.stack);
-      return { ok: false, err: err.stack };
+      return { ok: false, err: err.message };
     }
   },
 };

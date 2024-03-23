@@ -52,10 +52,15 @@ export default function ErrorModal({
   buttonText = "Okay",
   customAction,
   inland = false,
+  isError = true,
 }) {
   let children = (
     <ErrorContainer>
-      <ErrorIcon src="/animations/warning.gif" />
+      {isError ? (
+        <ErrorIcon src="/animations/warning.gif" />
+      ) : (
+        <ErrorIcon src="/icons/check-circle.svg" />
+      )}
       <Headline4>{title}</Headline4>
       <ErrorText>{text}</ErrorText>
       {!inland && (
