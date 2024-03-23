@@ -4,7 +4,7 @@ let model;
 async function loadModel() {
   model = await use.load();
 }
-async function vectorizeText(text) {
+async function vectorizeText({ text }) {
   try {
     if (!Array.isArray(text)) {
       return { ok: false, err: "Embedding needs to be an array." };

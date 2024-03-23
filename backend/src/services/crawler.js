@@ -1,8 +1,11 @@
 const puppeteer = require("puppeteer");
 const robotsParser = require("robots-parser");
-const fetch = require("node-fetch");
+const fetch = (...args) =>
+  import("node-fetch").then(({ default: fetch }) => fetch(...args));
+
 const { preprocessText } = require("../utils/helper");
 const { vectorizeText } = require("./vectorize");
+const { insertVector } = require("./qdrant");
 
 async function crawlUrl({ url }) {
   try {
@@ -68,12 +71,20 @@ module.exports = {
       if (!crawledData?.ok || crawledData?.data.length === 0) {
         return { ok: false, err: crawledData.err };
       }
+      const crawledContent = Object.values(crawledData.data);
       console.log("Done with Crawling and preprocessing the url");
-      const vector = await vectorizeText(Object.values(crawledData.data));
+      const vector = await vectorizeText({ text: crawledContent });
       if (!vector.ok) {
         return { ok: false, err: vector.err };
       }
-      return { ok: true, data: crawledData.data };
+      const insertedVector = await insertVector({
+        content: crawledContent,
+        vector: vector.data,
+      });
+      if (!insertedVector.ok) {
+        return { ok: false, err: insertedVector.err };
+      }
+      return { ok: true, data: "Data Crawling Completed" };
     } catch (err) {
       console.error(
         "Error in crawlerService: crawlUrlAndVectorize:",
