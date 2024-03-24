@@ -19,6 +19,9 @@ router.post(
   crawlerController.crawlUrlAndVectorize
 );
 
+// Submit Query
+router.post("/ask-query", authenticateJwtToken, crawlerController.askQuery);
+
 // Logout user
 router.delete("/logout", authenticateJwtToken, userController.logoutUser);
 

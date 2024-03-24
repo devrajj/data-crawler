@@ -24,4 +24,7 @@ export const loginUser = ({ email, password }) =>
 
 export const crawlUrl = ({ url }) => postChatBotApi("/crawl-url", { url });
 
+export const askQuery = ({ question }) =>
+  postChatBotApi("/ask-query", { question });
+
 export const logoutUser = () => deleteChatBotApi("/logout");

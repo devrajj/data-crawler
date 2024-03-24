@@ -22,54 +22,38 @@ async function crawlUrl({ url }) {
       robotsTxtContent = "";
     }
     const robotsTxt = robotsParser(robotsTxtURL, robotsTxtContent);
-    const deduplicatedUrls = new Set(); // Track crawled URLs to avoid duplicates
-
     while (bfsQueue.length) {
       const queueUrl = bfsQueue.pop();
-      if (deduplicatedUrls.has(queueUrl)) {
-        console.log(`Skipping duplicate URL: ${queueUrl}`);
-        continue;
-      }
-      deduplicatedUrls.add(queueUrl);
-
       console.log("crawling current url:", queueUrl);
       const page = await browser.newPage();
       try {
         await page.goto(queueUrl, { waitUntil: "networkidle2" });
 
+        // commenting as of now will check this later
         // if (robotsTxt && !robotsTxt.isAllowed(queueUrl)) {
         //   console.log(`URL ${queueUrl} is disallowed by robots.txt`);
-        //   await page.close();
         //   continue;
         // }
-        const textData = await page.evaluate(() => {
-          const textContent = [];
-          const elements = document.querySelectorAll("*");
-          for (const element of elements) {
-            if (element.tagName !== "SCRIPT" && element.tagName !== "STYLE") {
-              textContent.push(element.innerText);
-            }
-          }
-          return textContent.join(" ");
-        });
 
+        const textData = await page.$eval("*", (el) => el.innerText);
         const preprocessedText = preprocessText({ text: textData });
         data[queueUrl] = preprocessedText;
 
-        // const hrefs = await page.$$eval("a", (anchorEls) =>
-        //   anchorEls.map((a) => a.href)
-        // );
+        const hrefs = await page.$$eval("a", (anchorEls) =>
+          anchorEls.map((a) => a.href)
+        );
 
-        // const filteredHrefs = hrefs.filter(
-        //   (href) =>
-        //     new URL(href).origin === new URL(url).origin && // Same origin check
-        //     !deduplicatedUrls.has(href) // Not already crawled
-        // );
-        // bfsQueue.push(...filteredHrefs);
+        const filteredHrefs = hrefs.filter(
+          (href) =>
+            new URL(href).origin === new URL(url).origin &&
+            data[href] === undefined
+        );
+        bfsQueue.push(...filteredHrefs);
+        bfsQueue = [...new Set(bfsQueue)];
+        await page.close();
       } catch (error) {
         console.error("Error while crawling:", error);
         data[queueUrl] = `Error: ${error.message}`;
-      } finally {
         await page.close();
       }
     }

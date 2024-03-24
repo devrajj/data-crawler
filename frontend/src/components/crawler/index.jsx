@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled, { keyframes } from "styled-components";
-import { crawlUrl } from "../../utils/networkUtils";
+import { crawlUrl, askQuery } from "../../utils/networkUtils";
 import ErrorModal from "../../shared/ErrorModal";
 
 const fadeIn = keyframes`
@@ -77,6 +77,7 @@ function Crawler() {
   const [activeTab, setActiveTab] = useState("crawl");
   const [urlInput, setUrlInput] = useState("");
   const [crawlResult, setCrawlResult] = useState("");
+  const [askQueryResult, setAskQueryResult] = useState("");
   const [queryText, setQueryText] = useState("");
   const [error, setError] = useState("");
 
@@ -108,6 +109,18 @@ function Crawler() {
 
   const handleQuery = async () => {
     console.log("inside query", queryText);
+    if (queryText) {
+      try {
+        const res = await askQuery({ question: queryText });
+        if (res && res.data && res.data.ok && res.data.data) {
+          setAskQueryResult(res.data.data);
+        } else {
+          setError(res.data.err);
+        }
+      } catch (err) {
+        setError("Something went wrong");
+      }
+    }
   };
 
   return (
@@ -164,6 +177,14 @@ function Crawler() {
         <ErrorModal
           title={""}
           text={"Successfully crawled the URL"}
+          isError={false}
+          customAction={closeErrorModal}
+        />
+      )}
+      {askQueryResult && (
+        <ErrorModal
+          title={""}
+          text={askQueryResult}
           isError={false}
           customAction={closeErrorModal}
         />

@@ -2,7 +2,9 @@ require("@tensorflow/tfjs");
 const use = require("@tensorflow-models/universal-sentence-encoder");
 let model;
 async function loadModel() {
-  model = await use.load();
+  if (!model) {
+    model = await use.load();
+  }
 }
 async function vectorizeText({ text }) {
   try {
@@ -12,7 +14,8 @@ async function vectorizeText({ text }) {
     if (!model) {
       await loadModel();
     }
-    const embeddings = await model.embed(text);
+    const sentences = text.map((sentence) => sentence.trim());
+    const embeddings = await model.embed(sentences);
     const embeddingsArray = embeddings.arraySync()[0];
     return { ok: true, data: embeddingsArray };
   } catch (err) {
